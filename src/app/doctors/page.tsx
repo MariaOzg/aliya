@@ -9,6 +9,7 @@ interface Doctor {
   firstName: string;
   lastName: string;
   doctorSpecialty: string;
+  qualification?: string;
   profilePicture?: string;
   email: string;
 }
@@ -34,51 +35,39 @@ export default function DoctorsPage() {
         const mockDoctors: Doctor[] = [
           {
             _id: '1',
-            firstName: 'Иван',
-            lastName: 'Петров',
-            doctorSpecialty: 'Кардиология',
-            email: 'petrov@medclinic.ru',
-            profilePicture: 'https://randomuser.me/api/portraits/men/1.jpg'
+            firstName: 'Гульфия',
+            lastName: 'Абдурахманова',
+            doctorSpecialty: 'Неврология',
+            qualification: 'Врач высшей квалификационной категории',
+            email: 'abdurahmanova@medmel.ru',
+            profilePicture: 'https://randomuser.me/api/portraits/women/1.jpg'
           },
           {
             _id: '2',
-            firstName: 'Елена',
-            lastName: 'Смирнова',
+            firstName: 'Алия',
+            lastName: 'Озганбаева',
             doctorSpecialty: 'Терапия',
-            email: 'smirnova@medclinic.ru',
+            qualification: 'Врач терапевт',
+            email: 'ozganbaeva@medmel.ru',
             profilePicture: 'https://randomuser.me/api/portraits/women/2.jpg'
           },
           {
             _id: '3',
-            firstName: 'Алексей',
-            lastName: 'Иванов',
-            doctorSpecialty: 'Неврология',
-            email: 'ivanov@medclinic.ru',
-            profilePicture: 'https://randomuser.me/api/portraits/men/3.jpg'
+            firstName: 'Эмина',
+            lastName: 'Саитова',
+            doctorSpecialty: 'Педиатрия',
+            qualification: 'Главный врач',
+            email: 'saitova@medmel.ru',
+            profilePicture: 'https://randomuser.me/api/portraits/women/3.jpg'
           },
           {
             _id: '4',
-            firstName: 'Ольга',
-            lastName: 'Соколова',
-            doctorSpecialty: 'Стоматология',
-            email: 'sokolova@medclinic.ru',
+            firstName: 'Сеперхан',
+            lastName: 'Сариева',
+            doctorSpecialty: 'Нейропсихология',
+            qualification: 'Клинический психолог',
+            email: 'sarieva@medmel.ru',
             profilePicture: 'https://randomuser.me/api/portraits/women/4.jpg'
-          },
-          {
-            _id: '5',
-            firstName: 'Дмитрий',
-            lastName: 'Николаев',
-            doctorSpecialty: 'Диагностика',
-            email: 'nikolaev@medclinic.ru',
-            profilePicture: 'https://randomuser.me/api/portraits/men/5.jpg'
-          },
-          {
-            _id: '6',
-            firstName: 'Марина',
-            lastName: 'Козлова',
-            doctorSpecialty: 'Кардиология',
-            email: 'kozlova@medclinic.ru',
-            profilePicture: 'https://randomuser.me/api/portraits/women/6.jpg'
           }
         ];
         
@@ -192,6 +181,9 @@ export default function DoctorsPage() {
                       {doctor.doctorSpecialty}
                     </span>
                   </div>
+                  {doctor.qualification && (
+                    <p className="mt-2 text-sm text-gray-600">{doctor.qualification}</p>
+                  )}
                   <p className="mt-4 text-gray-500">
                     {doctor.email}
                   </p>

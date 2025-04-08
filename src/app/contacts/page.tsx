@@ -97,8 +97,7 @@ export default function ContactsPage() {
                 <div className="ml-3 text-base text-gray-700">
                   <p className="font-medium text-gray-900">Адрес</p>
                   <p className="mt-1">
-                    ул. Примерная, 123<br />
-                    г. Москва, 123456
+                    Сургут, Университетская, 23/5
                   </p>
                 </div>
               </div>
@@ -112,7 +111,7 @@ export default function ContactsPage() {
                 <div className="ml-3 text-base text-gray-700">
                   <p className="font-medium text-gray-900">Телефон</p>
                   <p className="mt-1">
-                    <a href="tel:+74951234567" className="hover:text-blue-600">+7 (495) 123-45-67</a>
+                    <a href="tel:+73462380894" className="hover:text-blue-600">+7 (3462) 38‒08‒94</a>
                   </p>
                   <p className="mt-1 text-sm text-gray-500">
                     Пн-Пт с 8:00 до 20:00<br />
@@ -130,7 +129,7 @@ export default function ContactsPage() {
                 <div className="ml-3 text-base text-gray-700">
                   <p className="font-medium text-gray-900">Email</p>
                   <p className="mt-1">
-                    <a href="mailto:info@medclinic.ru" className="hover:text-blue-600">info@medclinic.ru</a>
+                    <a href="mailto:info@medmel.ru" className="hover:text-blue-600">info@medmel.ru</a>
                   </p>
                 </div>
               </div>
