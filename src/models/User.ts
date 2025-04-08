@@ -1,85 +1,76 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
-  email: string;
-  password: string;
   firstName: string;
   lastName: string;
-  role: 'patient' | 'doctor' | 'admin';
+  email: string;
+  password: string;
   phoneNumber?: string;
   dateOfBirth?: Date;
-  doctorSpecialty?: string;
+  gender?: string;
+  role: 'patient' | 'doctor' | 'admin';
   profilePicture?: string;
-  comparePassword(candidatePassword: string): Promise<boolean>;
+  createdAt: Date;
+  updatedAt: Date;
+  // Дополнительные поля для докторов
+  specialties?: string[];
+  experience?: number;
+  education?: string;
+  languages?: string[];
+  // Методы
+  comparePassword: (candidatePassword: string) => Promise<boolean>;
 }
 
-const UserSchema = new Schema(
+// Schema definition
+const userSchema = new Schema<IUser>(
   {
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      lowercase: true,
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    phoneNumber: { type: String },
+    dateOfBirth: { type: Date },
+    gender: { type: String, enum: ['male', 'female', 'other'] },
+    role: { 
+      type: String, 
+      enum: ['patient', 'doctor', 'admin'], 
+      default: 'patient', 
+      required: true 
     },
-    password: {
-      type: String,
-      required: true,
-      minlength: 6,
-    },
-    firstName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    role: {
-      type: String,
-      enum: ['patient', 'doctor', 'admin'],
-      default: 'patient',
-    },
-    phoneNumber: {
-      type: String,
-      trim: true,
-    },
-    dateOfBirth: {
-      type: Date,
-    },
-    doctorSpecialty: {
-      type: String,
-      trim: true,
-    },
-    profilePicture: {
-      type: String,
-    },
+    profilePicture: { type: String },
+    // Поля только для докторов
+    specialties: [{ type: String }],
+    experience: { type: Number },
+    education: { type: String },
+    languages: [{ type: String }],
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// Хешируем пароль перед сохранением
-UserSchema.pre('save', async function (next) {
-  const user = this as any;
-  if (!user.isModified('password')) return next();
+// Метод для проверки пароля
+userSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    throw new Error(`Ошибка при сравнении паролей: ${error}`);
+  }
+};
 
+// Хук pre-save для хеширования пароля перед сохранением
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  
   try {
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt);
+    this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (error: any) {
     next(error);
   }
 });
 
-// Метод для сравнения паролей
-UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
-  return bcrypt.compare(candidatePassword, this.password);
-};
+// Проверяем существует ли модель, чтобы избежать ошибки OverwriteModelError
+const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema); 
+export default User; 

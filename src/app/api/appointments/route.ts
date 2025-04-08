@@ -1,94 +1,102 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
 import { connectToDatabase } from '@/lib/mongodb';
 import Appointment from '@/models/Appointment';
-import { getAuthSession } from '@/lib/auth';
-import { NextResponse } from 'next/server';
+import User from '@/models/User';
+import { authOptions } from '@/lib/auth';
 
-// Получение всех записей на прием с фильтрацией
-export async function GET(req: Request) {
+// Получение всех записей пользователя
+export async function GET(request: NextRequest) {
   try {
-    const session = await getAuthSession();
+    const session = await getServerSession(authOptions);
     
-    if (!session) {
+    // Проверяем авторизацию
+    if (!session || !session.user) {
       return NextResponse.json(
-        { error: 'Необходима авторизация' },
+        { error: 'Требуется авторизация' },
         { status: 401 }
       );
     }
     
-    const url = new URL(req.url);
-    const doctorId = url.searchParams.get('doctorId');
-    const patientId = url.searchParams.get('patientId');
-    const status = url.searchParams.get('status');
-    const date = url.searchParams.get('date');
-    
-    const query: any = {};
-    
-    // Пациенты могут видеть только свои записи
-    if (session.user.role === 'patient') {
-      query.patient = session.user.id;
-    } 
-    // Врачи могут видеть только записи к ним
-    else if (session.user.role === 'doctor') {
-      query.doctor = session.user.id;
-    } 
-    // Администраторы могут использовать фильтры для любых записей
-    else if (session.user.role === 'admin') {
-      if (doctorId) query.doctor = doctorId;
-      if (patientId) query.patient = patientId;
-    }
-    
-    if (status) query.status = status;
-    
-    if (date) {
-      const dateObj = new Date(date);
-      dateObj.setHours(0, 0, 0, 0);
-      const nextDay = new Date(dateObj);
-      nextDay.setDate(nextDay.getDate() + 1);
-      
-      query.date = {
-        $gte: dateObj,
-        $lt: nextDay
-      };
-    }
-    
     await connectToDatabase();
     
-    const appointments = await Appointment.find(query)
-      .populate('patient', 'firstName lastName email phoneNumber')
-      .populate('doctor', 'firstName lastName doctorSpecialty')
-      .sort({ date: 1, startTime: 1 });
+    let appointments;
     
-    return NextResponse.json(appointments);
+    // В зависимости от роли пользователя получаем разные записи
+    try {
+      const user = await User.findOne({ email: session.user.email });
+      
+      if (!user) {
+        return NextResponse.json(
+          { error: 'Пользователь не найден' },
+          { status: 404 }
+        );
+      }
+      
+      if (session.user.role === 'patient') {
+        appointments = await Appointment.find({ patient: user._id })
+          .populate('doctor', 'firstName lastName doctorSpecialty profilePicture')
+          .sort({ date: -1 });
+      } else if (session.user.role === 'doctor') {
+        appointments = await Appointment.find({ doctor: user._id })
+          .populate('patient', 'firstName lastName profilePicture')
+          .sort({ date: -1 });
+      } else if (session.user.role === 'admin') {
+        // Для админа показываем все записи
+        appointments = await Appointment.find({})
+          .populate('patient', 'firstName lastName profilePicture')
+          .populate('doctor', 'firstName lastName doctorSpecialty profilePicture')
+          .sort({ date: -1 });
+      } else {
+        return NextResponse.json(
+          { error: 'Недостаточно прав' },
+          { status: 403 }
+        );
+      }
+      
+      return NextResponse.json({ appointments });
+    } catch (error) {
+      console.error('Ошибка при получении записей:', error);
+      return NextResponse.json(
+        { error: 'Ошибка сервера при получении записей' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error('Ошибка при получении записей на прием:', error);
+    console.error('Ошибка при получении записей:', error);
     return NextResponse.json(
-      { error: 'Произошла ошибка при получении записей на прием' },
+      { error: 'Ошибка сервера при получении записей' },
       { status: 500 }
     );
   }
 }
 
-// Создание новой записи на прием
-export async function POST(req: Request) {
+// Создание новой записи
+export async function POST(request: NextRequest) {
   try {
-    const session = await getAuthSession();
+    const session = await getServerSession(authOptions);
     
-    if (!session) {
+    // Проверяем авторизацию
+    if (!session || !session.user) {
       return NextResponse.json(
-        { error: 'Необходима авторизация' },
+        { error: 'Требуется авторизация' },
         { status: 401 }
       );
     }
     
-    const body = await req.json();
-    let { patient, doctor, date, startTime, endTime, reason, notes } = body;
-    
-    // Пациенты могут создавать записи только для себя
-    if (session.user.role === 'patient') {
-      patient = session.user.id;
+    // Проверяем, что пользователь - пациент
+    if (session.user.role !== 'patient' && session.user.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Только пациенты и администраторы могут создавать записи на прием' },
+        { status: 403 }
+      );
     }
     
-    if (!patient || !doctor || !date || !startTime || !endTime || !reason) {
+    const body = await request.json();
+    const { doctor, date, startTime, endTime, reason, notes } = body;
+    
+    // Проверяем наличие обязательных полей
+    if (!doctor || !date || !startTime || !endTime || !reason) {
       return NextResponse.json(
         { error: 'Не все обязательные поля заполнены' },
         { status: 400 }
@@ -97,71 +105,38 @@ export async function POST(req: Request) {
     
     await connectToDatabase();
     
-    // Проверяем, не занято ли время у врача
-    const appointmentDate = new Date(date);
-    appointmentDate.setHours(0, 0, 0, 0);
-    const nextDay = new Date(appointmentDate);
-    nextDay.setDate(nextDay.getDate() + 1);
+    // Находим пациента по email
+    const patient = await User.findOne({ email: session.user.email });
     
-    const existingAppointment = await Appointment.findOne({
-      doctor,
-      date: {
-        $gte: appointmentDate,
-        $lt: nextDay
-      },
-      $or: [
-        { 
-          startTime: { $lte: startTime }, 
-          endTime: { $gt: startTime } 
-        },
-        { 
-          startTime: { $lt: endTime }, 
-          endTime: { $gte: endTime } 
-        },
-        { 
-          startTime: { $gte: startTime }, 
-          endTime: { $lte: endTime } 
-        }
-      ],
-      status: { $ne: 'cancelled' }
-    });
-    
-    if (existingAppointment) {
+    if (!patient) {
       return NextResponse.json(
-        { error: 'Выбранное время уже занято' },
-        { status: 409 }
+        { error: 'Пациент не найден' },
+        { status: 404 }
       );
     }
     
-    const newAppointment = new Appointment({
-      patient,
+    // Создаем новую запись
+    const appointment = new Appointment({
+      patient: patient._id,
       doctor,
-      date: appointmentDate,
+      date: new Date(date),
       startTime,
       endTime,
       reason,
-      notes,
+      notes: notes || '',
       status: 'pending'
     });
     
-    await newAppointment.save();
-    
-    const populatedAppointment = await Appointment.findById(newAppointment._id)
-      .populate('patient', 'firstName lastName email phoneNumber')
-      .populate('doctor', 'firstName lastName doctorSpecialty');
+    await appointment.save();
     
     return NextResponse.json(
-      {
-        success: true,
-        message: 'Запись на прием успешно создана',
-        appointment: populatedAppointment
-      },
+      { message: 'Запись успешно создана', appointment },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Ошибка при создании записи на прием:', error);
+    console.error('Ошибка при создании записи:', error);
     return NextResponse.json(
-      { error: 'Произошла ошибка при создании записи на прием' },
+      { error: 'Ошибка сервера при создании записи' },
       { status: 500 }
     );
   }
