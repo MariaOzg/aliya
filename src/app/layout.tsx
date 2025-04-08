@@ -8,8 +8,8 @@ import Footer from "@/components/navigation/Footer";
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
 export const metadata: Metadata = {
-  title: "Медицинская Клиника",
-  description: "Профессиональная медицинская помощь с использованием современного оборудования",
+  title: "Медмел | Медицина оздоровления",
+  description: "Клиника Медмел - профессиональная медицинская помощь с использованием современного оборудования",
 };
 
 export default function RootLayout({
