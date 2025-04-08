@@ -1,50 +1,45 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: string[];
+  redirectTo?: string;
 }
 
 export default function ProtectedRoute({ 
   children, 
-  allowedRoles = [] 
+  redirectTo = '/login' 
 }: ProtectedRouteProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    // Если пользователь не аутентифицирован и загрузка сессии завершена
-    if (status === 'unauthenticated') {
-      router.push('/auth/login');
+    if (status === 'loading') {
+      return;
     }
     
-    // Если пользователь аутентифицирован, но не имеет нужной роли
-    if (status === 'authenticated' && 
-        allowedRoles.length > 0 && 
-        !allowedRoles.includes(session?.user?.role)) {
-      router.push('/');
+    setIsLoading(false);
+    
+    if (!session) {
+      router.push(redirectTo);
     }
-  }, [status, session, router, allowedRoles]);
-  
-  // Показываем загрузку, пока проверяем сессию
-  if (status === 'loading') {
+  }, [session, status, router, redirectTo]);
+
+  if (isLoading || status === 'loading') {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
-  
-  // Если нет ролей для проверки или роль пользователя подходит, показываем контент
-  if (status === 'authenticated' && 
-      (allowedRoles.length === 0 || allowedRoles.includes(session?.user?.role))) {
-    return <>{children}</>;
+
+  if (!session) {
+    return null;
   }
-  
-  // По умолчанию ничего не показываем
-  return null;
+
+  return <>{children}</>;
 } 

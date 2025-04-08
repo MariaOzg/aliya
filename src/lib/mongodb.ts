@@ -40,13 +40,23 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then(() => mongoose);
+    console.log('Подключение к MongoDB...');
+    cached.promise = mongoose.connect(MONGODB_URI!, opts)
+      .then((mongoose) => {
+        console.log('Подключение к MongoDB успешно установлено');
+        return mongoose;
+      })
+      .catch((error) => {
+        console.error('Ошибка подключения к MongoDB:', error);
+        throw error;
+      });
   }
 
   try {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
+    console.error('Не удалось подключиться к MongoDB:', e);
     throw e;
   }
 
