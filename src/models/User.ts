@@ -65,7 +65,7 @@ const UserSchema = new Schema(
 
 // Хешируем пароль перед сохранением
 UserSchema.pre('save', async function (next) {
-  const user = this as IUser;
+  const user = this as any;
   if (!user.isModified('password')) return next();
 
   try {
