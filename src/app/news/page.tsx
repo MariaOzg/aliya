@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
@@ -21,14 +21,35 @@ interface News {
   };
 }
 
-export default function NewsPage() {
+// Компонент для извлечения параметров URL
+function SearchParamsReader({
+  onTypeParam
+}: {
+  onTypeParam: (type: string | null) => void;
+}) {
   const searchParams = useSearchParams();
-  const typeParam = searchParams.get('type');
+  
+  useEffect(() => {
+    const typeParam = searchParams.get('type');
+    onTypeParam(typeParam);
+  }, [searchParams, onTypeParam]);
+  
+  return null;
+}
+
+export default function NewsPage() {
+  const [typeParam, setTypeParam] = useState<string | null>(null);
   
   const [newsItems, setNewsItems] = useState<News[]>([]);
-  const [selectedType, setSelectedType] = useState<string | null>(typeParam);
+  const [selectedType, setSelectedType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Обработчик для получения параметра type из URL
+  const handleTypeParam = (type: string | null) => {
+    setTypeParam(type);
+    setSelectedType(type);
+  };
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -145,10 +166,6 @@ export default function NewsPage() {
     fetchNews();
   }, [selectedType]);
 
-  const handleTypeChange = (type: string | null) => {
-    setSelectedType(type);
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
       day: 'numeric',
@@ -159,6 +176,9 @@ export default function NewsPage() {
 
   return (
     <div className="bg-white">
+      <Suspense fallback={<div>Загрузка...</div>}>
+        <SearchParamsReader onTypeParam={handleTypeParam} />
+      </Suspense>
       <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Новости и акции</h1>
@@ -175,7 +195,7 @@ export default function NewsPage() {
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
-            onClick={() => handleTypeChange(null)}
+            onClick={() => handleTypeParam(null)}
           >
             Все
           </button>
@@ -185,7 +205,7 @@ export default function NewsPage() {
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
-            onClick={() => handleTypeChange('news')}
+            onClick={() => handleTypeParam('news')}
           >
             Новости
           </button>
@@ -195,7 +215,7 @@ export default function NewsPage() {
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
-            onClick={() => handleTypeChange('promotion')}
+            onClick={() => handleTypeParam('promotion')}
           >
             Акции
           </button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
@@ -25,18 +25,34 @@ interface TimeSlot {
   available: boolean;
 }
 
+// Компонент для извлечения параметров URL
+function SearchParamsReader({
+  onParamsLoad
+}: {
+  onParamsLoad: (doctorId: string | null, serviceId: string | null) => void;
+}) {
+  const searchParams = useSearchParams();
+  
+  useEffect(() => {
+    const doctorIdParam = searchParams.get('doctorId');
+    const serviceIdParam = searchParams.get('serviceId');
+    onParamsLoad(doctorIdParam, serviceIdParam);
+  }, [searchParams, onParamsLoad]);
+  
+  return null;
+}
+
 export default function NewAppointmentPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { data: session } = useSession();
   
-  const doctorIdParam = searchParams.get('doctorId');
-  const serviceIdParam = searchParams.get('serviceId');
+  const [doctorIdParam, setDoctorIdParam] = useState<string | null>(null);
+  const [serviceIdParam, setServiceIdParam] = useState<string | null>(null);
   
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-  const [selectedDoctor, setSelectedDoctor] = useState<string>(doctorIdParam || '');
-  const [selectedService, setSelectedService] = useState<string>(serviceIdParam || '');
+  const [selectedDoctor, setSelectedDoctor] = useState<string>('');
+  const [selectedService, setSelectedService] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [reason, setReason] = useState<string>('');
@@ -54,6 +70,13 @@ export default function NewAppointmentPage() {
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 30);
   const maxDateStr = maxDate.toISOString().split('T')[0];
+
+  const handleParamsLoad = (doctorId: string | null, serviceId: string | null) => {
+    setDoctorIdParam(doctorId);
+    setServiceIdParam(serviceId);
+    if (doctorId) setSelectedDoctor(doctorId);
+    if (serviceId) setSelectedService(serviceId);
+  };
 
   // Загружаем врачей и услуги при загрузке компонента
   useEffect(() => {
@@ -177,6 +200,9 @@ export default function NewAppointmentPage() {
 
   return (
     <ProtectedRoute>
+      <Suspense fallback={<div>Загрузка...</div>}>
+        <SearchParamsReader onParamsLoad={handleParamsLoad} />
+      </Suspense>
       <div className="max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
           <h1 className="text-3xl font-extrabold text-gray-900">Запись на прием</h1>

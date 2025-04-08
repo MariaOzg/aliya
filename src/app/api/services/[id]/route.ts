@@ -1,16 +1,19 @@
 import { connectToDatabase } from '@/lib/mongodb';
 import Service from '@/models/Service';
 import { getAuthSession } from '@/lib/auth';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-interface Params {
+type Props = {
   params: {
     id: string;
   };
-}
+};
 
 // Получение конкретной услуги
-export async function GET(req: Request, { params }: Params) {
+export async function GET(
+  request: NextRequest,
+  { params }: Props
+) {
   try {
     const { id } = params;
     
@@ -36,7 +39,10 @@ export async function GET(req: Request, { params }: Params) {
 }
 
 // Обновление услуги
-export async function PUT(req: Request, { params }: Params) {
+export async function PUT(
+  request: NextRequest,
+  { params }: Props
+) {
   try {
     const session = await getAuthSession();
     
@@ -49,7 +55,7 @@ export async function PUT(req: Request, { params }: Params) {
     }
     
     const { id } = params;
-    const body = await req.json();
+    const body = await request.json();
     
     await connectToDatabase();
     
@@ -85,7 +91,10 @@ export async function PUT(req: Request, { params }: Params) {
 }
 
 // Удаление услуги
-export async function DELETE(req: Request, { params }: Params) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: Props
+) {
   try {
     const session = await getAuthSession();
     

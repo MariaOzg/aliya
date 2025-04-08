@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -15,15 +15,36 @@ interface Service {
   imageUrl?: string;
 }
 
-export default function ServicesPage() {
+// Компонент для чтения параметров URL
+function SearchParamsReader({
+  onCategoryParam
+}: {
+  onCategoryParam: (category: string | null) => void;
+}) {
   const searchParams = useSearchParams();
-  const categoryParam = searchParams.get('category');
+  
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    onCategoryParam(categoryParam);
+  }, [searchParams, onCategoryParam]);
+  
+  return null;
+}
+
+export default function ServicesPage() {
+  const [categoryParam, setCategoryParam] = useState<string | null>(null);
   
   const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Обработчик для получения параметра category из URL
+  const handleCategoryParam = (category: string | null) => {
+    setCategoryParam(category);
+    setSelectedCategory(category);
+  };
 
   // Загрузка услуг и категорий
   useEffect(() => {
@@ -63,6 +84,9 @@ export default function ServicesPage() {
 
   return (
     <div className="bg-white">
+      <Suspense fallback={<div>Загрузка...</div>}>
+        <SearchParamsReader onCategoryParam={handleCategoryParam} />
+      </Suspense>
       <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Наши услуги</h1>
