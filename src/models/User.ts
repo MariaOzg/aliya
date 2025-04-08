@@ -73,4 +73,4 @@ userSchema.pre('save', async function(next) {
 // Проверяем существует ли модель, чтобы избежать ошибки OverwriteModelError
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 
-export default User; 
+export default User;

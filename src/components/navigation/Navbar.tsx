@@ -14,41 +14,42 @@ export default function Navbar() {
   };
   
   return (
-    <nav className="bg-white shadow">
+    <nav className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
+        <div className="flex justify-between h-20">
+          <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
                 <Image 
                   src="/images/logo.png" 
                   alt="Медмел" 
-                  width={180} 
-                  height={50} 
+                  width={200} 
+                  height={60} 
                   priority
+                  className="h-auto"
                 />
               </Link>
             </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link href="/" className="text-teal-600 hover:text-teal-800 px-3 py-2 text-sm font-medium">
+            <div className="hidden sm:ml-10 sm:flex sm:space-x-6">
+              <Link href="/" className="text-teal-600 hover:text-teal-800 border-transparent hover:border-teal-500 px-3 py-2 text-sm font-medium border-b-2 transition-all">
                 Главная
               </Link>
-              <Link href="/services" className="text-teal-600 hover:text-teal-800 px-3 py-2 text-sm font-medium">
+              <Link href="/services" className="text-teal-600 hover:text-teal-800 border-transparent hover:border-teal-500 px-3 py-2 text-sm font-medium border-b-2 transition-all">
                 Услуги
               </Link>
-              <Link href="/doctors" className="text-teal-600 hover:text-teal-800 px-3 py-2 text-sm font-medium">
+              <Link href="/doctors" className="text-teal-600 hover:text-teal-800 border-transparent hover:border-teal-500 px-3 py-2 text-sm font-medium border-b-2 transition-all">
                 Врачи
               </Link>
-              <Link href="/about" className="text-teal-600 hover:text-teal-800 px-3 py-2 text-sm font-medium">
+              <Link href="/about" className="text-teal-600 hover:text-teal-800 border-transparent hover:border-teal-500 px-3 py-2 text-sm font-medium border-b-2 transition-all">
                 О клинике
               </Link>
-              <Link href="/contacts" className="text-teal-600 hover:text-teal-800 px-3 py-2 text-sm font-medium">
+              <Link href="/contacts" className="text-teal-600 hover:text-teal-800 border-transparent hover:border-teal-500 px-3 py-2 text-sm font-medium border-b-2 transition-all">
                 Контакты
               </Link>
-              <Link href="/news" className="text-teal-600 hover:text-teal-800 px-3 py-2 text-sm font-medium">
+              <Link href="/news" className="text-teal-600 hover:text-teal-800 border-transparent hover:border-teal-500 px-3 py-2 text-sm font-medium border-b-2 transition-all">
                 Новости
               </Link>
-              <Link href="/education" className="text-teal-600 hover:text-teal-800 px-3 py-2 text-sm font-medium">
+              <Link href="/education" className="text-teal-600 hover:text-teal-800 border-transparent hover:border-teal-500 px-3 py-2 text-sm font-medium border-b-2 transition-all">
                 Образование
               </Link>
             </div>
@@ -61,36 +62,36 @@ export default function Navbar() {
                 </span>
                 
                 {session.user.role === 'admin' && (
-                  <Link href="/admin" className="text-white bg-teal-600 hover:bg-teal-700 px-3 py-2 rounded-md text-sm font-medium mr-2">
+                  <Link href="/admin" className="text-white bg-teal-600 hover:bg-teal-700 px-3 py-2 rounded-md text-sm font-medium mr-2 transition-colors">
                     Панель админа
                   </Link>
                 )}
                 
                 {session.user.role === 'doctor' && (
-                  <Link href="/doctor" className="text-white bg-teal-600 hover:bg-teal-700 px-3 py-2 rounded-md text-sm font-medium mr-2">
+                  <Link href="/doctor" className="text-white bg-teal-600 hover:bg-teal-700 px-3 py-2 rounded-md text-sm font-medium mr-2 transition-colors">
                     Мои приемы
                   </Link>
                 )}
                 
                 {session.user.role === 'patient' && (
-                  <Link href="/appointments" className="text-white bg-teal-600 hover:bg-teal-700 px-3 py-2 rounded-md text-sm font-medium mr-2">
+                  <Link href="/appointments" className="text-white bg-teal-600 hover:bg-teal-700 px-3 py-2 rounded-md text-sm font-medium mr-2 transition-colors">
                     Мои записи
                   </Link>
                 )}
                 
                 <button
                   onClick={() => signOut()}
-                  className="text-white bg-red-600 hover:bg-red-500 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-white bg-red-600 hover:bg-red-500 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Выйти
                 </button>
               </div>
             ) : (
               <div>
-                <Link href="/auth/login" className="text-white bg-teal-600 hover:bg-teal-700 px-3 py-2 rounded-md text-sm font-medium">
+                <Link href="/auth/login" className="text-white bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-md text-sm font-medium transition-colors">
                   Войти
                 </Link>
-                <Link href="/auth/register" className="text-white bg-green-600 hover:bg-green-500 ml-2 px-3 py-2 rounded-md text-sm font-medium">
+                <Link href="/auth/register" className="text-white bg-green-600 hover:bg-green-500 ml-3 px-4 py-2 rounded-md text-sm font-medium transition-colors">
                   Регистрация
                 </Link>
               </div>
@@ -143,25 +144,25 @@ export default function Navbar() {
       {/* Мобильное меню */}
       <div className={`${mobileMenuOpen ? 'block' : 'hidden'} sm:hidden`}>
         <div className="pt-2 pb-3 space-y-1">
-          <Link href="/" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium">
+          <Link href="/" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-teal-500">
             Главная
           </Link>
-          <Link href="/services" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium">
+          <Link href="/services" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-teal-500">
             Услуги
           </Link>
-          <Link href="/doctors" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium">
+          <Link href="/doctors" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-teal-500">
             Врачи
           </Link>
-          <Link href="/about" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium">
+          <Link href="/about" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-teal-500">
             О клинике
           </Link>
-          <Link href="/contacts" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium">
+          <Link href="/contacts" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-teal-500">
             Контакты
           </Link>
-          <Link href="/news" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium">
+          <Link href="/news" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-teal-500">
             Новости
           </Link>
-          <Link href="/education" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium">
+          <Link href="/education" className="text-teal-600 hover:bg-gray-100 hover:text-teal-800 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-teal-500">
             Образование
           </Link>
         </div>
