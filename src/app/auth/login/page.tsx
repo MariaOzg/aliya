@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -31,7 +32,9 @@ export default function LoginPage() {
       });
       
       if (result?.error) {
-        setError(result.error);
+        console.error('Ошибка входа:', result.error);
+        console.log('Попытка входа с email:', email);
+        setError(`Ошибка аутентификации: ${result.error}`);
         return;
       }
       
@@ -40,7 +43,7 @@ export default function LoginPage() {
       router.refresh();
     } catch (err) {
       console.error('Ошибка входа:', err);
-      setError('Произошла ошибка при авторизации');
+      setError(`Произошла ошибка при авторизации: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setLoading(false);
     }
@@ -140,9 +143,9 @@ export default function LoginPage() {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                <Link href="/auth/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
                   Забыли пароль?
-                </a>
+                </Link>
               </div>
             </div>
 
