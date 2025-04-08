@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Doctor {
   _id: string;
@@ -167,10 +168,12 @@ export default function DoctorsPage() {
               >
                 <div className="h-48 w-full bg-gray-200">
                   {doctor.profilePicture ? (
-                    <img
+                    <Image
                       src={doctor.profilePicture}
                       alt={`${doctor.firstName} ${doctor.lastName}`}
                       className="h-full w-full object-cover"
+                      width={400}
+                      height={300}
                     />
                   ) : (
                     <div className="h-full w-full flex items-center justify-center bg-blue-100">

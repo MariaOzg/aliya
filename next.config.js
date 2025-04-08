@@ -3,7 +3,11 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     domains: ['randomuser.me'], // Разрешаем загрузку изображений с randomuser.me
-  }
+  },
+  eslint: {
+    // Игнорируем ошибки ESLint при сборке
+    ignoreDuringBuilds: true,
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 interface Appointment {
@@ -14,7 +13,7 @@ interface Appointment {
 }
 
 export default function AppointmentsPage() {
-  const { data: session } = useSession();
+  const { } = useSession();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

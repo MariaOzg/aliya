@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, FormEvent, ChangeEvent } from 'react';
-import Link from 'next/link';
 
 export default function ContactsPage() {
   const [formData, setFormData] = useState({
@@ -62,7 +61,7 @@ export default function ContactsPage() {
         subject: '',
         message: '',
       });
-    } catch (error) {
+    } catch (_) {
       setStatus({
         submitted: false,
         submitting: false,

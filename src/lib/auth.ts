@@ -1,8 +1,7 @@
 import { connectToDatabase } from '@/lib/mongodb';
-import User from '@/models/User';
+import User, { IUser } from '@/models/User';
 import { NextAuthOptions, getServerSession } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { JWT } from 'next-auth/jwt';
 
 // Расширяем типы для NextAuth
 declare module 'next-auth' {
@@ -57,7 +56,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user._id.toString(),
+          id: (user as any)._id.toString(),
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,
           image: user.profilePicture,

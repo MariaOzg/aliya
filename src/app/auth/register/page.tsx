@@ -74,9 +74,9 @@ export default function RegisterPage() {
       
       // Перенаправление на страницу входа после успешной регистрации
       router.push('/auth/login?registered=true');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Ошибка регистрации:', err);
-      setError(err.message || 'Произошла ошибка при регистрации');
+      setError(err instanceof Error ? err.message : 'Произошла ошибка при регистрации');
     } finally {
       setLoading(false);
     }

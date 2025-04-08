@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Service {
   _id: string;
@@ -121,10 +122,12 @@ export default function ServicesPage() {
               >
                 {service.imageUrl && (
                   <div className="h-48 w-full bg-gray-200 flex items-center justify-center">
-                    <img
+                    <Image
                       src={service.imageUrl}
                       alt={service.name}
                       className="h-full w-full object-cover"
+                      width={400}
+                      height={300}
                     />
                   </div>
                 )}

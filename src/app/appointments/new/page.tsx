@@ -167,9 +167,9 @@ export default function NewAppointmentPage() {
       setTimeout(() => {
         router.push('/appointments');
       }, 2000);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Ошибка при создании записи:', error);
-      setError(error.message || 'Произошла ошибка при создании записи на прием');
+      setError(error instanceof Error ? error.message : 'Произошла ошибка при создании записи на прием');
     } finally {
       setLoading(false);
     }

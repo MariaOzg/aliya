@@ -6,7 +6,7 @@ import User from '@/models/User';
 import { authOptions } from '@/lib/auth';
 
 // Получение всех записей пользователя
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     

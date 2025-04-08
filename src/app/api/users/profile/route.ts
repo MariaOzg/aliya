@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { connectToDatabase } from '@/lib/mongodb';
-import mongoose from 'mongoose';
 import User from '@/models/User';
 
 // Обработчик GET-запроса для получения данных профиля
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession();
     
@@ -87,7 +86,8 @@ export async function PUT(request: NextRequest) {
     // Применяем обновления
     allowedUpdates.forEach((field) => {
       if (data[field] !== undefined) {
-        user[field] = data[field];
+        // Используем type assertion для безопасного доступа к динамическим свойствам
+        (user as any)[field] = data[field];
       }
     });
     
